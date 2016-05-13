@@ -8,4 +8,7 @@ Open the erlang repl `werl` on Windows, `erl` everywhere else. Change to the dir
 If everything worked as planned you should see a simple output of `tests_ok`. If a test fails the system will give a `no match` error.
 
 You can use your own data by creating a file called `openhours.txt` and entering in a list of tuples with 3 items, and closing with a full `.` stop. See below for an example.
-`[{1,800,1600},{2,1000,1930}].`
+
+    [{1,800,1600},{2,1000,1930}].
+
+Use the functions `is_open_on/1` or `next_opening_date/1` to test against your `openhours.txt`.    

@@ -44,17 +44,12 @@ FUNCTION nextOpeningDate(tdDateTime)
 	RETURN TTOC(ldNextOpen,3) + 'Z'
 ENDFUNC 
 
-FUNCTION DowNormalized(tdDate) && Set Monday to first day of week
-	RETURN DOW(tdDate,2)
-ENDFUNC 
-
-
 * Read from a file if need be or setup the default test.
 FUNCTION setup()
 	* CSV file, dow (Monday being 1), start time (military), end time (military)
-	* 1,800,1600
-	* 3,800,1600
-	* 5,800,1600
+	* mon,800,1600
+	* wed,800,1600
+	* thu,800,1600
 	LOCAL lcFile
 	lcFile = 'openhours.csv'
 	CREATE CURSOR openhours ( ;
@@ -67,7 +62,7 @@ FUNCTION setup()
 		ALINES(laLines,lcContents)
 		FOR EACH lcLine in laLines
 			IF ALINES(laVal,lcLine,1,',') = 3
-				INSERT into openhours values(VAL(laVal(1)),VAL(laVal(2)),VAL(laVal(3)))
+				INSERT into openhours values(DowFromString(laVal(1)),VAL(laVal(2)),VAL(laVal(3)))
 			ENDIF 
 		ENDFOR
 		RELEASE laLines
@@ -78,4 +73,32 @@ FUNCTION setup()
 		INSERT into openhours values(5,800,1600)
 	ENDIF 
 	INDEX on dayofweek tag dow unique
+ENDFUNC 
+
+FUNCTION DowNormalized(tdDate) && Set Monday to first day of week
+	RETURN DOW(tdDate,2)
+ENDFUNC 
+
+FUNCTION DowFromString(tcDow)
+	LOCAL lcDow, lnDow
+	lcDow = LOWER(tcDow)
+	DO CASE
+	CASE lcDow = 'mon'
+		lnDow = 1
+	CASE lcDow = 'tue'
+		lnDow = 2
+	CASE lcDow = 'wed'
+		lnDow = 3
+	CASE lcDow = 'thu'
+		lnDow = 4
+	CASE lcDow = 'fri'
+		lnDow = 5
+	CASE lcDow = 'sat'
+		lnDow = 6
+	CASE lcDow = 'sun'
+		lnDow = 7
+	OTHERWISE
+		THROW "Improper day of week. Expecting day of week in string format as 'mon','tue',..."
+	ENDCASE
+	RETURN lnDow
 ENDFUNC 
